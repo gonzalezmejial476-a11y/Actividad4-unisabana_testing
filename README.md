@@ -43,6 +43,60 @@ El reporte se generará en `target/site/jacoco/index.html`
 mvn verify
 ```
 
+## Pipeline CI/CD Automático
+
+El proyecto incluye un **pipeline de integración continua (CI/CD)** configurado con GitHub Actions.
+
+### ¿Qué hace el pipeline?
+
+El workflow `.github/workflows/ci-cd.yml` ejecuta automáticamente:
+
+1. **Build y pruebas** (en Java 21 y 25):
+   - Compila el proyecto (`mvn clean compile`)
+   - Ejecuta pruebas unitarias de dominio (`DriverLicenseTest`)
+   - Ejecuta tests de servicio con mocks (`DriverLicenseServiceTest`)
+   - Ejecuta tests de integración con H2 (`DriverLicenseRepositoryIntegrationTest`)
+   - Ejecuta tests del controlador con MockMvc (`DriverLicenseControllerMockMvcTest`)
+   - Verifica cobertura con JaCoCo (≥ 80%)
+
+2. **Validación de calidad**:
+   - Checkstyle (si está configurado)
+   - SpotBugs (si está configurado)
+
+3. **Cobertura**:
+   - Genera reportes JaCoCo
+   - Valida que la cobertura cumpla el mínimo requerido
+
+4. **Generación de artefactos**:
+   - Sube reportes de JaCoCo
+   - Sube reportes de Surefire para consulta posterior
+
+### Cuándo se ejecuta
+
+- En cada **push** a las ramas: `main`, `develop`, `appmod/**`
+- En cada **pull request** hacia `main` o `develop`
+- Los resultados aparecen en la pestaña **Actions** del repositorio
+
+### Cómo ver resultados
+
+1. Ve a la pestaña **Actions** en GitHub
+2. Selecciona la rama o el PR
+3. Consulta el estado de cada job:
+   - ✓ Verde: Todas las pruebas pasaron
+   - ✗ Rojo: Alguna prueba o validación falló
+4. Descarga los artefactos (reportes JaCoCo y Surefire) desde el resumen de la ejecución
+
+### Protección de rama (recomendado)
+
+Para evitar que se mergee código que no pase las pruebas:
+
+1. Ve a **Settings** > **Branches**
+2. Selecciona `main` o `develop`
+3. Habilita **Require status checks to pass before merging**
+4. Marca como obligatorios: `build-and-test` y `coverage-report`
+
+Esto impedirá que un PR se pueda mergear si las pruebas fallan o la cobertura no cumple el mínimo.
+
 ## Estructura del Proyecto
 
 ```

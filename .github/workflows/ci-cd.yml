@@ -1,0 +1,167 @@
+name: CI/CD Pipeline - Testing Workshop
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'appmod/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        java-version: ['21', '25']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Java ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Display Java version
+        run: java -version && javac -version && mvn --version
+      
+      - name: Build project
+        run: mvn clean compile
+      
+      - name: Run unit tests
+        run: mvn -Dtest=DriverLicenseTest test
+      
+      - name: Run service unit tests with mocks
+        run: mvn -Dtest=DriverLicenseServiceTest test
+      
+      - name: Run integration tests (H2)
+        run: mvn -Dtest=DriverLicenseRepositoryIntegrationTest test
+      
+      - name: Run controller tests (MockMvc)
+        run: mvn -Dtest=DriverLicenseControllerMockMvcTest test
+      
+      - name: Generate JaCoCo coverage report
+        run: mvn clean verify
+      
+      - name: Upload JaCoCo report to artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report-java${{ matrix.java-version }}
+          path: target/site/jacoco
+          retention-days: 30
+      
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports-java${{ matrix.java-version }}
+          path: target/surefire-reports
+          retention-days: 30
+      
+      - name: Extract and display coverage percentage
+        if: always()
+        run: |
+          if [ -f target/site/jacoco/jacoco.xml ]; then
+            echo "=== JaCoCo Coverage Report ===" 
+            grep -o 'covered="[^"]*"' target/site/jacoco/jacoco.xml | head -1
+            grep '<counter' target/site/jacoco/jacoco.xml | grep 'type="LINE"'
+          else
+            echo "JaCoCo report not found"
+          fi
+
+  code-quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Run Checkstyle (if configured)
+        run: mvn checkstyle:check || echo "Checkstyle not configured"
+      
+      - name: Run SpotBugs (if configured)
+        run: mvn spotbugs:check || echo "SpotBugs not configured"
+
+  coverage-report:
+    name: Coverage Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Verify coverage meets minimum threshold
+        run: |
+          mvn clean verify
+          echo "✓ All tests passed with JaCoCo verification"
+      
+      - name: Comment PR with coverage results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            try {
+              const jacocoXml = fs.readFileSync('target/site/jacoco/jacoco.xml', 'utf8');
+              const lineMatch = jacocoXml.match(/<counter type="LINE"[^>]*>/);
+              
+              if (lineMatch) {
+                github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: `## Coverage Report\n\n✓ Tests passed and coverage verified.\n\n${lineMatch[0]}`
+                });
+              }
+            } catch (e) {
+              console.log('Could not generate coverage comment:', e);
+            }
+
+  notify-status:
+    name: Notify Build Status
+    runs-on: ubuntu-latest
+    needs: [build-and-test, code-quality, coverage-report]
+    if: always()
+    
+    steps:
+      - name: Build Status Summary
+        run: |
+          echo "=== CI/CD Pipeline Summary ===" 
+          echo "Build and Test: ${{ needs.build-and-test.result }}"
+          echo "Code Quality: ${{ needs.code-quality.result }}"
+          echo "Coverage Validation: ${{ needs.coverage-report.result }}"
+          
+          if [ "${{ needs.build-and-test.result }}" = "success" ] && [ "${{ needs.coverage-report.result }}" = "success" ]; then
+            echo "✓ All checks passed - ready to merge"
+            exit 0
+          else
+            echo "✗ Some checks failed - review required"
+            exit 1
+          fi
