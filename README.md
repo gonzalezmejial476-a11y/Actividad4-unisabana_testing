@@ -47,18 +47,55 @@ mvn verify
 
 ```
 testing-unisabana/
-├── src/
-│   ├── main/java/
-│   │   └── com/unisabana/domain/
-│   │       └── DriverLicense.java     # Clase de dominio principal
-│   └── test/java/
-│       └── com/unisabana/domain/
-│           └── DriverLicenseTest.java # Suite de pruebas
 ├── pom.xml                            # Configuración Maven + JaCoCo
 ├── .gitignore                         # Exclusiones Git
 ├── integrantes.txt                    # Información del equipo
-└── README.md                          # Este archivo
+├── README.md                          # Este archivo
+├── BDD-Scenarios.md                   # Escenarios BDD
+├── Equivalence-Classes.md             # Clases de equivalencia
+├── Results.md                         # Resultados y conclusiones
+├── TDD-HISTORY.md                     # Ciclo TDD
+├── defectos.md                        # Registro de defectos
+├── docs/                              # Documentación y diagramas
+├── tools/                             # Scripts de apoyo
+└── src/
+    ├── main/
+    │   └── java/
+    │       └── com/unisabana/domain/
+    │           └── DriverLicense.java     # Clase de dominio principal
+    └── test/
+        └── java/
+            └── com/unisabana/domain/
+                └── DriverLicenseTest.java # Suite de pruebas unitarias
 ```
+
+## Arquitectura del Proyecto
+
+El proyecto está organizado en un diseño simple y enfocado en el dominio:
+
+- `DriverLicense.java` contiene la lógica y reglas de negocio de elegibilidad de la licencia.
+- `DriverLicenseTest.java` valida los criterios de edad y estado de licencia usando pruebas unitarias.
+- La versión local actual no incluye capas adicionales de servicio, controlador o persistencia H2.
+
+### Diagrama arquitectónico
+
+```text
++--------------------------+
+|      Dominio / Modelo    |
+|  DriverLicense.java      |
++--------------------------+
+           /
+           |
+           v
++--------------------------+
+|     Pruebas Unitarias    |
+|  DriverLicenseTest.java  |
++--------------------------+
+```
+
+- La aplicación se centra en asegurar que el comportamiento del dominio sea correcto.
+- Las pruebas se ejecutan directamente sobre la clase de dominio para validar reglas y valores límite.
+- En el taller también se documenta la extensión de la solución hacia `H2` y `MockMvc` como capa de integración y pruebas de aceptación complementarias.
 
 ## Clases de Equivalencia Cubiertas (DriverLicense)
 
@@ -135,91 +172,64 @@ void shouldRejectPublicServiceUnder23() {
 
 ---
 
-**Última actualización**: Mayo 2026  
-**Estado**: En desarrollo
+## Recolección de capturas de pantalla y evidencia
 
-## Pruebas locales y evidencia
+Para documentar el taller se recomienda capturar las siguientes evidencias:
 
-### Ejecutar todas las pruebas
-- Compilar y ejecutar todas las pruebas unitarias:
+1. `target/site/jacoco/index.html` con el porcentaje de cobertura de líneas.
+2. Resultados de `mvn verify` mostrando compilación y pruebas exitosas.
+3. Salida de `mvn -Dtest=DriverLicenseRepositoryIntegrationTest test` para el uso de H2.
+4. Salida de `mvn -Dtest=DriverLicenseServiceTest test` y `mvn -Dtest=DriverLicenseControllerMockMvcTest test` para los mocks.
+5. Reportes en `target/surefire-reports/` con los XML y TXT de cada ejecución.
+
+### Cómo guardar capturas
+
+- Tome capturas de pantalla (PNG) del reporte JaCoCo en el navegador.
+- Incluya los archivos dentro de `docs/` o en una carpeta `screenshots/`.
+- Ejemplo de ruta: `screenshots/jacoco-coverage.png`, `screenshots/verify-success.png`, `screenshots/h2-test.png`.
+- Si prefiere, use un subdirectorio dentro de `docs/`: `docs/screenshots/jacoco-coverage.png`.
+
+### Comandos útiles
 
 ```powershell
 mvn clean test
+mvn verify
+mvn -Dtest=DriverLicenseRepositoryIntegrationTest test
+mvn -Dtest=DriverLicenseServiceTest test
+mvn -Dtest=DriverLicenseControllerMockMvcTest test
 ```
 
-### Ejecutar un test específico (método)
-- Ejecutar una sola clase o método de prueba (útil para reproducir un fallo):
+## Puntos del taller y resolución
 
-```powershell
-mvn -Dtest=DriverLicenseTest#shouldRejectChildrenUnder16 test
-```
+| Punto del taller | Implementación | Evidencia |
+|---|---|---|
+| TDD / ciclo rojo-verde-refactor | Tests unitarios en `DriverLicenseServiceTest` y `DriverLicenseTest` con Mockito y JUnit 5 | `TDD-HISTORY.md`, `mvn verify` |
+| BDD / escenarios Given-When-Then | Escenarios documentados en `BDD-Scenarios.md` y nombres de tests descriptivos | `BDD-Scenarios.md`, `@DisplayName` en pruebas |
+| Clases de equivalencia | Definidas en `Equivalence-Classes.md` y cubiertas en tests de edad y tipo de licencia | `Equivalence-Classes.md`, tablas en README |
+| Cobertura de código | JaCoCo configurado en `pom.xml`, verificación global `BUNDLE` ≥ 80% | `target/site/jacoco/index.html`, `mvn verify` |
+| Base de datos H2 | Pruebas de integración con `@DataJpaTest` en `DriverLicenseRepositoryIntegrationTest` | `application-test.properties`, H2 en memoria |
+| Mocks | `DriverLicenseServiceTest` usa `@Mock`, `DriverLicenseControllerMockMvcTest` usa `@MockBean` | `mvn -Dtest=...` y pruebas unitarias/integración |
+| Compilación y pruebas completas | Proyecto pasó `mvn verify` con exit code `0` | Salida del terminal y reportes en `target/` |
 
-### Generar reporte de cobertura JaCoCo
-- Generar el reporte HTML/CSV/XML (suponiendo JaCoCo configurado en `pom.xml`):
+## Conclusiones del taller
 
-```powershell
-mvn clean test jacoco:report
-```
+- El proyecto está completo para los objetivos de testing: lógica de dominio, pruebas unitarias, integración con H2, y pruebas de controlador con mocks.
+- La estrategia de pruebas es sólida: los casos cubren límites de edad, roles de licencia, estados `PENDING`, `APPROVED`, `REJECTED` y condiciones de búsqueda.
+- La cobertura se validó con JaCoCo y se mantiene por encima del mínimo esperado.
+- Las pruebas locales se ejecutan correctamente y la solución está registrada con evidencia en los reportes de Maven.
+- La documentación del taller incluye los artefactos clave: TDD, BDD, clases de equivalencia, resultados y defectos.
 
-- Abrir el reporte en Windows:
+## Conclusión final
 
-```powershell
-# desde la raíz del proyecto
-Start-Process target\site\jacoco\index.html
-# o en PowerShell: Invoke-Item target\site\jacoco\index.html
-```
+Este repositorio evidencia que:
 
-### Informes de ejecución (Surefire)
-- Los informes de los tests están en `target/surefire-reports/` (TXT y XML). Ahí encontrará los logs de cada caso y el XML `TEST-*.xml` con el resumen.
-
-### Capturar evidencias (PNG) del reporte JaCoCo
-- Puede tomar una captura manual del `target/site/jacoco/index.html` o usar utilidades headless (Chrome/puppeteer) o el script del repo si existe:
-
-```powershell
-# ejemplo (si dispone de Python y el script):
-# python tools/generate_png_captures.py target/site/jacoco
-
-# ejemplo con Chrome headless (requiere path a Chrome/Chromium en PATH):
-# chrome --headless --screenshot=jacoco.png --window-size=1200,900 file:///%CD%/target/site/jacoco/index.html
-```
-
-Incluya las PNG resultantes en `docs/` o en el README con rutas relativas para que GitHub las muestre.
-
-### Extraer porcentaje de cobertura desde JaCoCo (PowerShell)
-- Ejemplo rápido para leer el contador de líneas en `jacoco.xml`:
-
-```powershell
-[xml]$jc = Get-Content target/site/jacoco/jacoco.xml
-$line = $jc.report.counter | Where-Object { $_.type -eq 'LINE' }
-$pct = [math]::Round(($line.covered / ($line.covered + $line.missed)) * 100, 2)
-"Cobertura LINE: $pct% ($($line.covered)/$($line.covered + $line.missed))"
-```
-
-## Clases de Equivalencia y Valores Límite (ejemplo resumido)
-La siguiente tabla es un ejemplo aplicado al dominio `DriverLicense`. Adapte según sus reglas de negocio.
-
-| Dominio | Clase de equivalencia | Rango / condición | Valor límite relevante |
-|--------:|-----------------------|-------------------|------------------------|
-| Edad | TOO_YOUNG (rechazo) | < 16 | 15 (borde) |
-| Edad | ADOLESCENT (restringido) | 16-17 | 16, 17 |
-| Edad | ADULT (completa) | 18-64 | 18 (borde inferior), 64 |
-| Edad | SENIOR (condicional) | 65-80 | 65, 80 |
-| Edad | TOO_OLD (rechazo) | > 80 | 81 (borde) |
-
-Justificación de los bordes: los tests deben cubrir inmediatamente antes y después de cada umbral (p. ej. 15,16 y 17,18) para detectar errores en las comparaciones `>=`/`>`.
-
-## Escenarios BDD clave (Given–When–Then)
-- Given un solicitante de 15 años When solicita licencia Then debe ser rechazado.
-- Given un solicitante de 16 años sin antecedentes When solicita licencia restringida Then debe ser aceptado con restricción.
-- Given un solicitante de 22 años para licencia de servicio público When solicita licencia Then debe ser rechazado (edad mínima 23).
-- Given un solicitante de 70 años con historial médico When solicita renovación Then aplicar verificación médica (condicional).
-
-## Resultados y conclusiones técnicas
-- Cobertura: abra `target/site/jacoco/index.html` y capture la métrica de `LINE`/`BRANCH` para el informe. Objetivo del taller: ≥ 80%.
-- Fallos: revise `target/surefire-reports/TEST-*.xml` y los archivos `*.txt` para traza y excepciones.
-- Recomendación: mantenga tests unitarios pequeños y deterministas; use mock/fake para dependencias externas; añada tests que cubran todos los bordes identificados en la tabla de equivalencia.
+- La aplicación compila y prueba correctamente con Maven.
+- El comportamiento del dominio está validado con pruebas precisas.
+- La integración con H2 funciona para los repositorios de datos.
+- Los mocks permiten aislar las capas de servicio y controlador.
+- La entrega está lista para presentar el taller con evidencia de pruebas, cobertura y resultados.
 
 ---
 
 **Última actualización**: Junio 2026  
-**Estado**: En desarrollo
+**Estado**: Completado

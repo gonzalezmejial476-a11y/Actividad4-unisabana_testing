@@ -1,4 +1,4 @@
-package com.unisabana.domain;
+package edu.unisabana.proyecto.domain;
 
 /**
  * DriverLicense: Clase de dominio para validar elegibilidad de licencia de conducción.
@@ -16,7 +16,7 @@ public class DriverLicense {
     // Constantes - Edades según normativa colombiana
     private static final int MIN_AGE_REGULAR = 16;           // Conducción normal de carros
     private static final int MIN_AGE_PUBLIC_SERVICE = 23;    // Servicio público (taxi, uber, buses)
-    private static final int MAX_AGE = 80;                   // Edad máxima legal
+    private static final int MAX_AGE = 88;                   // Edad máxima legal
     
     // Identificación
     private String documentId;

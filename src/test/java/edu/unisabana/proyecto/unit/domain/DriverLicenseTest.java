@@ -1,5 +1,6 @@
-package com.unisabana.domain;
+package edu.unisabana.proyecto.unit.domain;
 
+import edu.unisabana.proyecto.domain.DriverLicense;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
  * REGLAS COLOMBIA:
  * - Edad mínima conducción regular: 16 años
  * - Edad mínima servicio público (taxis, uber, buses): 23 años
- * - Edad máxima: 80 años
+ * - Edad máxima: 88 años
  * - Discapacidad visual severa: NO puede conducir
  * - Antecedentes penales: NO puede obtener licencia
  * 
@@ -124,8 +125,8 @@ class DriverLicenseTest {
         }
 
         @ParameterizedTest
-        @ValueSource(ints = {65, 70, 75, 80})
-        @DisplayName("Should allow license with renewal for seniors (65-80 years)")
+        @ValueSource(ints = {65, 70, 75, 80, 85, 88})
+        @DisplayName("Should allow license with renewal for seniors (65-88 years)")
         void shouldAllowSeniorsWithRenewal(int age) {
             // ARRANGE & ACT
             DriverLicense senior = new DriverLicense("1", "Senior", age, false, false, 0, "REGULAR");
@@ -136,9 +137,9 @@ class DriverLicenseTest {
         }
 
         @ParameterizedTest
-        @ValueSource(ints = {81, 90, 100})
-        @DisplayName("Should reject licenses for people over 80 years (TOO_OLD)")
-        void shouldRejectOver80Years(int age) {
+        @ValueSource(ints = {89, 90, 100})
+        @DisplayName("Should reject licenses for people over 88 years (TOO_OLD)")
+        void shouldRejectOver88Years(int age) {
             // ARRANGE & ACT
             DriverLicense tooOld = new DriverLicense("1", "TooOld", age, false, false, 0, "REGULAR");
             
@@ -465,10 +466,10 @@ class DriverLicenseTest {
         }
 
         @Test
-        @DisplayName("BV: Age = 80 (maximum age)")
-        void boundaryValue_Age80() {
+        @DisplayName("BV: Age = 88 (maximum age)")
+        void boundaryValue_Age88() {
             // ARRANGE & ACT
-            DriverLicense person = new DriverLicense("1", "Test", 80, false, false, 0, "REGULAR");
+            DriverLicense person = new DriverLicense("1", "Test", 88, false, false, 0, "REGULAR");
             
             // ASSERT
             assertThat(person.isWithinMaximumAge()).isTrue();
@@ -477,10 +478,10 @@ class DriverLicenseTest {
         }
 
         @Test
-        @DisplayName("BV: Age = 81 (just after maximum 80)")
-        void boundaryValue_Age81() {
+        @DisplayName("BV: Age = 89 (just after maximum 88)")
+        void boundaryValue_Age89() {
             // ARRANGE & ACT
-            DriverLicense person = new DriverLicense("1", "Test", 81, false, false, 0, "REGULAR");
+            DriverLicense person = new DriverLicense("1", "Test", 89, false, false, 0, "REGULAR");
             
             // ASSERT
             assertThat(person.isWithinMaximumAge()).isFalse();
