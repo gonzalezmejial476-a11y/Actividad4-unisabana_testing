@@ -1,9 +1,10 @@
-# Testing Workshop - Universidad de Sabana
+# Taller de Testing - Universidad de Sabana
 
 ## Descripción del Proyecto
 
-**Dominio**: Elegibilidad para Licencias de Conducción (`DriverLicense`)
-**Objetivo**: Aplicar TDD, BDD, AAA, clases de equivalencia y cobertura de código
+**Dominio**: Elegibilidad para Licencias de Conducción (`DriverLicense`)  
+**Objetivo**: Aplicar TDD, BDD, AAA, clases de equivalencia y cobertura de código  
+**Arquitectura**: Arquitectura Hexagonal (Domain-Driven Design)
 
 ## Integrantes
 
@@ -16,13 +17,13 @@ Para la documentación completa del taller, consulte el **[Wiki del Repositorio]
 ### Secciones del Wiki:
 
 1. **[Inicio](https://github.com/LEGM121/testing-unisabana/wiki)** - Dominio, alcance y equipo
-2. **[TDD: Red-Green-Refactor](https://github.com/LEGM121/testing-unisabana/wiki/TDD-History)** - 3+ iteraciones
+2. **[TDD: Ciclo Rojo-Verde-Refactor](https://github.com/LEGM121/testing-unisabana/wiki/TDD-History)** - 3+ iteraciones
 3. **[Patrón AAA](https://github.com/LEGM121/testing-unisabana/wiki/AAA-Pattern)** - Arrange-Act-Assert
 4. **[Clases de Equivalencia](https://github.com/LEGM121/testing-unisabana/wiki/Equivalence-Classes)** - Tabla y justificación
-5. **[BDD: Given-When-Then](BDD-Scenarios.md)** - Escenarios
+5. **[BDD: Dado-Cuando-Entonces](BDD-Scenarios.md)** - Escenarios
 6. **[Resultados](Results.md)** - JaCoCo y conclusiones
-7. **[TDD History](TDD-HISTORY.md)** - Ciclos Rojo/Verde/Refactor
-7. **[Defectos](https://github.com/LEGM121/testing-unisabana/wiki/Defects)** - Análisis de defectos
+7. **[Historial TDD](TDD-HISTORY.md)** - Ciclos Rojo/Verde/Refactor
+8. **[Defectos](https://github.com/LEGM121/testing-unisabana/wiki/Defects)** - Análisis de defectos
 
 ## Cómo Ejecutar
 
@@ -46,190 +47,314 @@ mvn verify
 ## Estructura del Proyecto
 
 ```
-testing-unisabana/
-├── pom.xml                            # Configuración Maven + JaCoCo
+actividad_4-testing-unisabana/
+├── pom.xml                            # Configuración Maven + JaCoCo (Java 21, Spring Boot 3.3.0)
 ├── .gitignore                         # Exclusiones Git
 ├── integrantes.txt                    # Información del equipo
 ├── README.md                          # Este archivo
-├── BDD-Scenarios.md                   # Escenarios BDD
+├── BDD-Scenarios.md                   # Escenarios BDD (Dado-Cuando-Entonces)
 ├── Equivalence-Classes.md             # Clases de equivalencia
 ├── Results.md                         # Resultados y conclusiones
-├── TDD-HISTORY.md                     # Ciclo TDD
+├── TDD-HISTORY.md                     # Ciclo TDD (Rojo-Verde-Refactor)
+├── WIKI.md                            # Wiki del proyecto
 ├── defectos.md                        # Registro de defectos
 ├── docs/                              # Documentación y diagramas
+├── screenshots/                       # Capturas de evidencia (JaCoCo, tests, etc.)
 ├── tools/                             # Scripts de apoyo
+│
 └── src/
-    ├── main/
-    │   └── java/
-    │       └── com/unisabana/domain/
-    │           └── DriverLicense.java     # Clase de dominio principal
-    └── test/
-        └── java/
-            └── com/unisabana/domain/
-                └── DriverLicenseTest.java # Suite de pruebas unitarias
+    ├── main/java/edu/unisabana/proyecto/
+    │   ├── TestingWorkshopApplication.java         # Aplicación Spring Boot
+    │   │
+    │   ├── domain/
+    │   │   └── DriverLicense.java                  # Entidad de dominio: Lógica de elegibilidad
+    │   │
+    │   ├── application/
+    │   │   └── DriverLicenseService.java           # Servicio de aplicación: Casos de uso
+    │   │
+    │   ├── delivery/rest/
+    │   │   └── DriverLicenseController.java        # REST Controller: Endpoints HTTP
+    │   │
+    │   └── infrastructure/persistence/
+    │       ├── DriverLicenseEntity.java            # Entity JPA para persistencia
+    │       └── DriverLicenseRepository.java        # Spring Data JPA Repository
+    │
+    └── test/java/edu/unisabana/proyecto/
+        ├── unit/
+        │   ├── domain/
+        │   │   └── DriverLicenseTest.java          # Tests unitarios: Lógica de dominio
+        │   └── service/
+        │       └── DriverLicenseServiceTest.java   # Tests unitarios: Servicio con mocks
+        │
+        ├── integration/
+        │   └── persistence/
+        │       └── DriverLicenseRepositoryIntegrationTest.java  # Tests con BD H2
+        │
+        └── system/
+            └── delivery/
+                └── DriverLicenseControllerMockMvcTest.java      # Tests REST con MockMvc
 ```
 
 ## Arquitectura del Proyecto
 
-El proyecto está organizado en un diseño simple y enfocado en el dominio:
+El proyecto implementa **Arquitectura Hexagonal** (puertos y adaptadores) con capas bien definidas:
 
-- `DriverLicense.java` contiene la lógica y reglas de negocio de elegibilidad de la licencia.
-- `DriverLicenseTest.java` valida los criterios de edad y estado de licencia usando pruebas unitarias.
-- La versión local actual no incluye capas adicionales de servicio, controlador o persistencia H2.
-
-### Diagrama arquitectónico
-
-```text
-+--------------------------+
-|      Dominio / Modelo    |
-|  DriverLicense.java      |
-+--------------------------+
-           /
-           |
-           v
-+--------------------------+
-|     Pruebas Unitarias    |
-|  DriverLicenseTest.java  |
-+--------------------------+
+```
+┌─────────────────────────────────────────────────────────┐
+│         CAPA DE PRESENTACIÓN (REST)                     │
+│      DriverLicenseController                            │
+│  GET /api/driver-licenses                              │
+│  POST /api/driver-licenses                             │
+│  GET /api/driver-licenses/{id}                         │
+└────────────────────┬────────────────────────────────────┘
+                     │ Solicitud/Respuesta HTTP
+                     ↓
+┌─────────────────────────────────────────────────────────┐
+│       CAPA DE APLICACIÓN (SERVICIOS)                    │
+│      DriverLicenseService                               │
+│  • isEligibleForLicense()                              │
+│  • getAllDriverLicenses()                              │
+│  • getDriverLicenseById()                              │
+└────────────────────┬────────────────────────────────────┘
+                     │ Interfaz de Negocio
+                     ↓
+┌─────────────────────────────────────────────────────────┐
+│    CAPA DE DOMINIO (NÚCLEO DE NEGOCIO)                  │
+│           DriverLicense                                 │
+│  Reglas de Elegibilidad:                               │
+│  • Edad mínima: 16 años (con restricciones)            │
+│  • Edad máxima: 80 años                                │
+│  • Estados: PENDIENTE, APROBADA, RECHAZADA             │
+│  • Tipos: REGULAR, SERVICIO PÚBLICO                    │
+└────────────────────┬────────────────────────────────────┘
+                     │ Persistencia
+                     ↓
+┌─────────────────────────────────────────────────────────┐
+│  CAPA DE INFRAESTRUCTURA (PERSISTENCIA)                 │
+│  DriverLicenseRepository (Spring Data JPA)             │
+│  DriverLicenseEntity (JPA Entity)                      │
+│  ↓                                                      │
+│  Base de Datos H2 (en memoria para tests)              │
+└─────────────────────────────────────────────────────────┘
 ```
 
-- La aplicación se centra en asegurar que el comportamiento del dominio sea correcto.
-- Las pruebas se ejecutan directamente sobre la clase de dominio para validar reglas y valores límite.
-- En el taller también se documenta la extensión de la solución hacia `H2` y `MockMvc` como capa de integración y pruebas de aceptación complementarias.
+### Componentes por Capa
 
-## Clases de Equivalencia Cubiertas (DriverLicense)
+| Capa | Componente | Responsabilidad | Tests |
+|------|-----------|-----------------|-------|
+| **Presentación** | `DriverLicenseController` | Endpoints REST, mapeo HTTP | `DriverLicenseControllerMockMvcTest` |
+| **Aplicación** | `DriverLicenseService` | Orquestación, casos de uso | `DriverLicenseServiceTest` |
+| **Dominio** | `DriverLicense` | Lógica de negocio, validaciones | `DriverLicenseTest` |
+| **Infraestructura** | `DriverLicenseRepository`, `DriverLicenseEntity` | Persistencia con JPA/H2 | `DriverLicenseRepositoryIntegrationTest` |
 
-| Clase | Rango | Tests |
-|-------|-------|-------|
-| TOO_YOUNG | < 16 | `shouldRejectChildrenUnder16` |
-| ADOLESCENT | 16-17 | `shouldAllowRestrictedLicenseForAdolescents` |
-| YOUNG_ADULT | 18-22 | `shouldAllowYoungAdults` |
-| ADULT | 23-64 | `shouldAllowFullLicenseAdults` |
-| SENIOR | 65-80 | `shouldAllowSeniorsWithRenewal` |
-| TOO_OLD | > 80 | `shouldRejectOver80Years` |
+## Estrategia de Testing
 
-## Valores Límite Identificados
+El proyecto implementa testing en **3 niveles**:
 
-| Límite | Valor | Test | Justificación |
+### 1️⃣ Tests Unitarios
+- **Ubicación**: `src/test/java/edu/unisabana/proyecto/unit/`
+- **Cobertura**:
+  - `DriverLicenseTest.java`: Valida la lógica de dominio directamente
+  - `DriverLicenseServiceTest.java`: Tests del servicio con Mockito (@Mock)
+- **Patrón**: AAA (Arrange-Act-Assert)
+- **Ejecución**: `mvn clean test`
+
+### 2️⃣ Tests de Integración
+- **Ubicación**: `src/test/java/edu/unisabana/proyecto/integration/`
+- **Cobertura**:
+  - `DriverLicenseRepositoryIntegrationTest.java`: Pruebas con BD H2 (@DataJpaTest)
+- **Propósito**: Validar persistencia y recuperación de datos
+- **Ejecución**: `mvn -Dtest=DriverLicenseRepositoryIntegrationTest test`
+
+### 3️⃣ Tests de Sistema
+- **Ubicación**: `src/test/java/edu/unisabana/proyecto/system/`
+- **Cobertura**:
+  - `DriverLicenseControllerMockMvcTest.java`: Tests REST con MockMvc (@SpringBootTest)
+- **Propósito**: Validar endpoints HTTP y flujos completos
+- **Ejecución**: `mvn -Dtest=DriverLicenseControllerMockMvcTest test`
+
+## Clases de Equivalencia
+
+| Clase | Rango de Edad | Descripción | Test |
+|-------|-------|-------------|-------|
+| MUY_JOVEN | < 16 | Menores de edad (rechazados) | `shouldRejectChildrenUnder16` |
+| ADOLESCENTE | 16-17 | Adolescentes con restricciones | `shouldAllowRestrictedLicenseForAdolescents` |
+| ADULTO_JOVEN | 18-22 | Adultos jóvenes | `shouldAllowYoungAdults` |
+| ADULTO | 23-64 | Adultos plenos | `shouldAllowFullLicenseAdults` |
+| JUBILADO | 65-80 | Jubilados (renovación obligatoria) | `shouldAllowSeniorsWithRenewal` |
+| MUY_MAYOR | > 80 | Mayor a 80 años (rechazados) | `shouldRejectOver80Years` |
+
+## Valores Límite
+
+| Límite Crítico | Valor | Test | Justificación |
 |--------|-------|------|---------------|
-| Mayoría de edad | 18 | `boundaryValue_AgeEighteen` | Transición minor→adult |
-| Justo antes mayoría | 17 | `boundaryValue_AgeSeventeen` | Último día menor |
-| Jubilación | 65 | `boundaryValue_AgeSixtyfive` | Edad legal jubilación |
-| Justo antes jubilación | 64 | `boundaryValue_AgeSixtyfour` | Último año activo |
-| Cambio niño→adolescente | 13 | `boundaryValue_AgeThirteen` | Inicio adolescencia |
-| Último año infantil | 12 | `boundaryValue_AgeEleven` | Fin infancia |
+| Mayoría de edad | 18 | `boundaryValue_AgeEighteen` | Transición menor→adulto |
+| Justo antes mayoría | 17 | `boundaryValue_AgeSeventeen` | Último día como menor |
+| Inicio jubilación | 65 | `boundaryValue_AgeSixtyfive` | Edad legal de jubilación |
+| Fin edad activa | 64 | `boundaryValue_AgeSixtyfour` | Último año de adulto |
+| Inicio adolescencia | 16 | `boundaryValue_AgeSixteen` | Mínima edad permitida |
+| Máximo permitido | 80 | `boundaryValue_AgeEighty` | Límite superior |
 
 ## Patrón AAA (Arrange-Act-Assert)
 
-Todos los tests siguen la estructura. Ejemplo aplicado a `DriverLicense`:
+Todos los tests siguen esta estructura estándar:
 
 ```java
 @Test
-@DisplayName("Should retrieve driver attributes correctly")
-void shouldRetrieveAllAttributes() {
+@DisplayName("Debe recuperar los atributos del conductor correctamente")
+void debeRecuperarAtributosCorrectamente() {
     // ARRANGE: Preparar datos de prueba
-    DriverLicense person = new DriverLicense("1001", "Juan Pérez García", 25, false, false, 0, "REGULAR");
+    DriverLicense persona = new DriverLicense("1001", "Juan Pérez García", 25, false, false, 0, "REGULAR");
 
-    // ACT: Obtener atributos
-    String name = person.getFullName();
+    // ACT: Ejecutar la acción
+    String nombre = persona.getFullName();
 
     // ASSERT: Verificar el resultado esperado
-    assertThat(name).isEqualTo("Juan Pérez García");
+    assertThat(nombre).isEqualTo("Juan Pérez García");
 }
 ```
 
-## BDD: Escenarios Given-When-Then
+## BDD: Escenarios Dado-Cuando-Entonces
 
-Los tests siguen el estilo Given–When–Then en su descripción. Ejemplo:
+Los tests siguen el estilo BDD en su descripción:
 
 ```java
 @Test
-@DisplayName("Given a 22-year-old When applying for public service license Then should be rejected (too young)")
-void shouldRejectPublicServiceUnder23() {
-    // Given
-    DriverLicense youngDriver = new DriverLicense("1", "Young", 22, false, false, 0, "PUBLIC_SERVICE");
-    // When
-    boolean isEligible = youngDriver.isEligibleForLicense();
-    // Then
-    assertThat(isEligible).isFalse();
+@DisplayName("Dado un conductor de 22 años Cuando solicita licencia de servicio público Entonces debe ser rechazado")
+void debeRechazarServicioPublicoMenor23() {
+    // Dado
+    DriverLicense conductorJoven = new DriverLicense("1", "Joven", 22, false, false, 0, "PUBLIC_SERVICE");
+    
+    // Cuando
+    boolean esElegible = conductorJoven.isEligibleForLicense();
+    
+    // Entonces
+    assertThat(esElegible).isFalse();
 }
 ```
 
 ## Requisitos
 
-- Java 11+
-- Maven 3.6+
-- JUnit 5
-- AssertJ
-- JaCoCo
+- **Java**: 21
+- **Maven**: 3.6+
+- **Spring Boot**: 3.3.0
+- **JUnit**: 5.9.2
+- **Mockito**: 5.3.1
+- **AssertJ**: 3.24.1
+- **JaCoCo**: 0.8.15
+- **H2 Database**: 2.2.224
 
-## Notas
+## Composición de Lenguajes
 
-- El proyecto es totalmente compilable: `mvn clean test` sin pasos adicionales
-- Cobertura objetivo: ≥ 80%
-- Todos los tests siguen nomenclatura: `should<Expected>When<Condition>()`
-- El Wiki contiene documentación oficial (no PDF)
+- **Java**: 93.1% (Código de producción y tests)
+- **Python**: 6.9% (Scripts de utilidad)
 
----
+## Cobertura de Código
 
-## Recolección de capturas de pantalla y evidencia
+**Objetivo**: ≥ 80% de cobertura de líneas
 
-Para documentar el taller se recomienda capturar las siguientes evidencias:
+- Configuración en `pom.xml` con JaCoCo
+- Verificación automática en fase `verify`
+- Reporte HTML en `target/site/jacoco/index.html`
 
-1. `target/site/jacoco/index.html` con el porcentaje de cobertura de líneas.
-2. Resultados de `mvn verify` mostrando compilación y pruebas exitosas.
-3. Salida de `mvn -Dtest=DriverLicenseRepositoryIntegrationTest test` para el uso de H2.
-4. Salida de `mvn -Dtest=DriverLicenseServiceTest test` y `mvn -Dtest=DriverLicenseControllerMockMvcTest test` para los mocks.
-5. Reportes en `target/surefire-reports/` con los XML y TXT de cada ejecución.
+### Comandos para validar cobertura:
+```bash
+# Generar reporte
+mvn clean test jacoco:report
 
-### Cómo guardar capturas
-
-- Tome capturas de pantalla (PNG) del reporte JaCoCo en el navegador.
-- Incluya los archivos dentro de `docs/` o en una carpeta `screenshots/`.
-- Ejemplo de ruta: `screenshots/jacoco-coverage.png`, `screenshots/verify-success.png`, `screenshots/h2-test.png`.
-- Si prefiere, use un subdirectorio dentro de `docs/`: `docs/screenshots/jacoco-coverage.png`.
-
-### Comandos útiles
-
-```powershell
-mvn clean test
+# Verificar mínimo de cobertura
 mvn verify
-mvn -Dtest=DriverLicenseRepositoryIntegrationTest test
-mvn -Dtest=DriverLicenseServiceTest test
-mvn -Dtest=DriverLicenseControllerMockMvcTest test
+
+# Ver reporte en navegador
+open target/site/jacoco/index.html
 ```
 
-## Puntos del taller y resolución
+## Notas Importantes
 
-| Punto del taller | Implementación | Evidencia |
-|---|---|---|
-| TDD / ciclo rojo-verde-refactor | Tests unitarios en `DriverLicenseServiceTest` y `DriverLicenseTest` con Mockito y JUnit 5 | `TDD-HISTORY.md`, `mvn verify` |
-| BDD / escenarios Given-When-Then | Escenarios documentados en `BDD-Scenarios.md` y nombres de tests descriptivos | `BDD-Scenarios.md`, `@DisplayName` en pruebas |
-| Clases de equivalencia | Definidas en `Equivalence-Classes.md` y cubiertas en tests de edad y tipo de licencia | `Equivalence-Classes.md`, tablas en README |
-| Cobertura de código | JaCoCo configurado en `pom.xml`, verificación global `BUNDLE` ≥ 80% | `target/site/jacoco/index.html`, `mvn verify` |
-| Base de datos H2 | Pruebas de integración con `@DataJpaTest` en `DriverLicenseRepositoryIntegrationTest` | `application-test.properties`, H2 en memoria |
-| Mocks | `DriverLicenseServiceTest` usa `@Mock`, `DriverLicenseControllerMockMvcTest` usa `@MockBean` | `mvn -Dtest=...` y pruebas unitarias/integración |
-| Compilación y pruebas completas | Proyecto pasó `mvn verify` con exit code `0` | Salida del terminal y reportes en `target/` |
+- ✅ Proyecto completamente compilable: `mvn clean test` sin pasos adicionales
+- ✅ Cobertura objetivo: ≥ 80%
+- ✅ Todos los tests siguen nomenclatura: `debe<Esperado>Cuando<Condición>()`
+- ✅ Arquitectura Hexagonal: Dominio aislado, independencia de frameworks
+- ✅ Tests a múltiples niveles: Unitarios, Integración, Sistema
+- ✅ Uso de mocks para aislar capas
+- ✅ Base de datos H2 para tests de integración
 
-## Conclusiones del taller
+## Recolección de Capturas de Pantalla
 
-- El proyecto está completo para los objetivos de testing: lógica de dominio, pruebas unitarias, integración con H2, y pruebas de controlador con mocks.
-- La estrategia de pruebas es sólida: los casos cubren límites de edad, roles de licencia, estados `PENDING`, `APPROVED`, `REJECTED` y condiciones de búsqueda.
-- La cobertura se validó con JaCoCo y se mantiene por encima del mínimo esperado.
-- Las pruebas locales se ejecutan correctamente y la solución está registrada con evidencia en los reportes de Maven.
-- La documentación del taller incluye los artefactos clave: TDD, BDD, clases de equivalencia, resultados y defectos.
+Para documentar el taller se recomienda capturar:
 
-## Conclusión final
+1. **Cobertura JaCoCo**: Porcentaje de líneas cubiertas
+2. **Verificación Maven**: `mvn verify` exitosa
+3. **Tests de Integración**: Pruebas con BD H2
+4. **Tests Unitarios**: Servicio con mocks
+5. **Tests REST**: Endpoints con MockMvc
+6. **Reportes Surefire**: XML y TXT de cada ejecución
 
-Este repositorio evidencia que:
+### Estructura de capturas:
+```
+screenshots/
+├── jacoco-coverage.png
+├── verify-success.png
+├── h2-integration-test.png
+├── service-unit-test.png
+└── controller-system-test.png
+```
 
-- La aplicación compila y prueba correctamente con Maven.
-- El comportamiento del dominio está validado con pruebas precisas.
-- La integración con H2 funciona para los repositorios de datos.
-- Los mocks permiten aislar las capas de servicio y controlador.
-- La entrega está lista para presentar el taller con evidencia de pruebas, cobertura y resultados.
+### Comandos Útiles
+
+```bash
+# Tests unitarios
+mvn clean test
+
+# Validar cobertura mínima
+mvn verify
+
+# Tests de integración
+mvn -Dtest=DriverLicenseRepositoryIntegrationTest test
+
+# Tests del servicio
+mvn -Dtest=DriverLicenseServiceTest test
+
+# Tests del controlador
+mvn -Dtest=DriverLicenseControllerMockMvcTest test
+
+# Generar reporte JaCoCo
+mvn jacoco:report
+```
+
+## Puntos del Taller
+
+| Punto | Implementación | Ubicación | Estado |
+|---|---|---|---|
+| **TDD** | Tests unitarios Red-Verde-Refactor | `DriverLicenseTest`, `DriverLicenseServiceTest` | ✅ |
+| **BDD** | Escenarios Dado-Cuando-Entonces | `BDD-Scenarios.md` | ✅ |
+| **Clases de Equivalencia** | 6 clases definidas y cubiertas | `Equivalence-Classes.md` | ✅ |
+| **Valores Límite** | Pruebas en límites críticos | Tests de boundary | ✅ |
+| **Patrón AAA** | Arrange-Act-Assert | Todos los tests | ✅ |
+| **Cobertura ≥ 80%** | JaCoCo validado | `pom.xml` | ✅ |
+| **BD H2** | Integración JPA | `DriverLicenseRepositoryIntegrationTest` | ✅ |
+| **Mocks** | Mockito + MockMvc | Service y Controller tests | ✅ |
+
+## Stack de Tecnologías
+
+```
+Java 21 + Spring Boot 3.3.0
+    ├── Testing
+    │   ├── JUnit 5
+    │   ├── Mockito
+    │   ├── AssertJ
+    │   └── MockMvc
+    ├── Persistencia
+    │   ├── Spring Data JPA
+    │   └── H2 Database
+    ├── Calidad
+    │   └── JaCoCo
+    └── Build
+        └── Maven 3.6+
+```
 
 ---
 
 **Última actualización**: Junio 2026  
-**Estado**: Completado
+**Estado**: ✅ Completado  
+**Rama por defecto**: `appmod/java-upgrade-20260606192045`
