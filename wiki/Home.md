@@ -244,3 +244,52 @@ Esta es la documentación oficial de entrega que refleja todo el proceso de dise
 
 **Última actualización**: Junio 2026  
 **Rama por defecto**: `appmod/java-upgrade-20260606192045`
+
+pantallazos de ejecucion :
+<img width="921" height="328" alt="image" src="https://github.com/user-attachments/assets/cdccfb06-7ada-4698-bc9e-81f74d14cbbc" />
+<img width="921" height="465" alt="image" src="https://github.com/user-attachments/assets/db4cff0e-bc67-4a39-8d0e-3d956b878be4" />
+Uso h2
+<img width="921" height="348" alt="image" src="https://github.com/user-attachments/assets/a29048de-ff30-4123-ad09-8d38cb99f546" />
+<img width="921" height="396" alt="image" src="https://github.com/user-attachments/assets/a5414dfa-3adf-4988-9ed5-ed8c5c3e4951" />
+<img width="921" height="603" alt="image" src="https://github.com/user-attachments/assets/22f58660-398e-4af7-8533-e0ab3228f6ce" />
+<img width="921" height="515" alt="image" src="https://github.com/user-attachments/assets/4ba44702-8874-4962-8d96-b503e89d47d0" />
+jacoco
+<img width="1687" height="353" alt="image" src="https://github.com/user-attachments/assets/ecc35afc-866d-4710-a66c-161322f5afb8" />
+<img width="921" height="207" alt="image" src="https://github.com/user-attachments/assets/d0963668-6213-4f5d-8007-63a49b7d04e8" />
+<img width="921" height="303" alt="image" src="https://github.com/user-attachments/assets/2c147063-612c-4b46-99e7-d3bef5dd6496" 
+  <img width="921" height="168" alt="image" src="https://github.com/user-attachments/assets/e431228a-c085-472e-b634-98c098561971" />
+
+mocks
+<img width="921" height="354" alt="image" src="https://github.com/user-attachments/assets/ebdd6276-7a8c-4213-86ce-62ace613fef3" />
+<img width="921" height="463" alt="image" src="https://github.com/user-attachments/assets/2a1b11a1-ca3a-4a44-a3d0-e459620914bd" />
+<img width="921" height="360" alt="image" src="https://github.com/user-attachments/assets/8d07bacd-3796-484f-9957-354a60c8c777" />
+pipeline
+<img width="1896" height="758" alt="image" src="https://github.com/user-attachments/assets/7e6de14e-c951-4708-becb-6e01425a8e58" />
+<img width="1912" height="958" alt="image" src="https://github.com/user-attachments/assets/71b1ced6-c096-4353-bbc9-14d4722834dd" />
+
+<img width="1912" height="981" alt="image" src="https://github.com/user-attachments/assets/2c43eb53-6e3f-4a2d-a26a-f975b8e1f6f5" 
+  <img width="1902" height="915" alt="image" src="https://github.com/user-attachments/assets/7c32a534-6821-4387-8f1a-3175b747ca0f" />
+  <img width="1872" height="912" alt="image" src="https://github.com/user-attachments/assets/b2a522f8-518d-45d2-9133-0a558f12ffc2" />
+  <img width="1781" height="820" alt="image" src="https://github.com/user-attachments/assets/22e698bc-856a-4da8-9982-d6cabfbd6a54" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
