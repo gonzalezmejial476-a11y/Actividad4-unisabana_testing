@@ -13,6 +13,9 @@
 ## Contenido del Wiki
 porfa el archivose encuentra en la estructura del repo consulte todo
 <img width="1487" height="405" alt="image" src="https://github.com/user-attachments/assets/07a2604e-ff8b-43d1-a084-7d096c05e2fd" />
+tambien encotrara los pantallazos de le ejecucion
+<img width="1803" height="907" alt="image" src="https://github.com/user-attachments/assets/a6b541fb-5514-4d90-9e08-a5fae8c79a6e" />
+
 
 ## Cómo Ejecutar
 
