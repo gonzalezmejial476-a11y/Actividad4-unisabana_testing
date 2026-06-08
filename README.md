@@ -1,5 +1,5 @@
 # Taller de Testing - Universidad de Sabana
-
+ El presente ejercicio tiene como finalidad validar los requisitos minimos establecidos en Colombia para la obtención de una licencia de conducción para automóviles. Para ello, se desarrolló un validador de licencias de conducción que aplica las principales reglas de negocio definidas para determinar si una persona es apta para obtener este documento. Las validaciones implementadas consideran los siguientes criterios: • Edad mínima de 16 años para obtener una licencia de conducción regular. • Edad mínima de 23 años para obtener una licencia destinada al servicio público. • Edad máxima permitida de 80 años. • No presentar discapacidad visual severa que impida una conducción segura. • No contar con antecedentes penales graves que inhabiliten la obtención de la licencia.
 ## Descripción del Proyecto
 
 **Dominio**: Elegibilidad para Licencias de Conducción (`DriverLicense`)  
