@@ -12,18 +12,9 @@
 
 ## Contenido del Wiki
 
-Para la documentación completa del taller, consulte el **[Wiki del Repositorio](https://github.com/LEGM121/testing-unisabana/wiki)**.
 
-### Secciones del Wiki:
 
-1. **[Inicio](https://github.com/LEGM121/testing-unisabana/wiki)** - Dominio, alcance y equipo
-2. **[TDD: Ciclo Rojo-Verde-Refactor](https://github.com/LEGM121/testing-unisabana/wiki/TDD-History)** - 3+ iteraciones
-3. **[Patrón AAA](https://github.com/LEGM121/testing-unisabana/wiki/AAA-Pattern)** - Arrange-Act-Assert
-4. **[Clases de Equivalencia](https://github.com/LEGM121/testing-unisabana/wiki/Equivalence-Classes)** - Tabla y justificación
-5. **[BDD: Dado-Cuando-Entonces](BDD-Scenarios.md)** - Escenarios
-6. **[Resultados](Results.md)** - JaCoCo y conclusiones
-7. **[Historial TDD](TDD-HISTORY.md)** - Ciclos Rojo/Verde/Refactor
-8. **[Defectos](https://github.com/LEGM121/testing-unisabana/wiki/Defects)** - Análisis de defectos
+
 
 ## Cómo Ejecutar
 
