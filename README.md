@@ -11,10 +11,8 @@
 - Luis Eduardo Gonzalez Mejia
 
 ## Contenido del Wiki
-
-
-
-
+porfa el archivose encuentra en la estructura del repo consulte todo
+<img width="1487" height="405" alt="image" src="https://github.com/user-attachments/assets/07a2604e-ff8b-43d1-a084-7d096c05e2fd" />
 
 ## Cómo Ejecutar
 
